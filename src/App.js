@@ -90,49 +90,51 @@ function App() {
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
             <button className="refresh" onClick={() => window.location.reload()}>LÀM MỚI</button>
-            <table>
-                <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>Name</th>
-                    <th onClick={() => handleSort('m400')}>400m</th>
-                    <th onClick={() => handleSort('h-mile')}>Half-mile</th>
-                    <th onClick={() => handleSort('1k')}>1K</th>
-                    <th onClick={() => handleSort('one-mile')}>One-mile</th>
-                    <th onClick={() => handleSort('two-mile')}>Two-mile</th>
-                    <th onClick={() => handleSort('5K')}>5K</th>
-                    <th onClick={() => handleSort('10K')}>10K</th>
-                    <th onClick={() => handleSort('15K')}>15K</th>
-                    <th onClick={() => handleSort('10mile')}>10-mile</th>
-                    <th onClick={() => handleSort('20K')}>20K</th>
-                    <th onClick={() => handleSort('Half-Marathon')}>Half-Marathon</th>
-                    <th onClick={() => handleSort('Marathon')}>Marathon</th>
-                </tr>
-                </thead>
-                <tbody>
-                {filteredData.map((item) => (
-                    <tr key={item.athlete_id}>
-                        <td>{item.rank}</td>
-                        <td className="name-column">
-                            <img className="avatar" src={item.avatar_src} alt="Avatar" />
-                            <span>{item.name}</span>
-                        </td>
-                        <td>{formatTime(Number(item.m400))}</td>
-                        <td>{formatTime(Number(item["h-mile"]))}</td>
-                        <td>{formatTime(Number(item["1k"]))}</td>
-                        <td>{formatTime(Number(item["one-mile"]))}</td>
-                        <td>{formatTime(Number(item["two-mile"]))}</td>
-                        <td>{formatTime(Number(item["5K"]))}</td>
-                        <td>{formatTime(Number(item["10K"]))}</td>
-                        <td>{formatTime(Number(item["15K"]))}</td>
-                        <td>{formatTime(Number(item["10mile"]))}</td>
-                        <td>{formatTime(Number(item["20K"]))}</td>
-                        <td>{formatTime(Number(item["Half-Marathon"]))}</td>
-                        <td>{formatTime(Number(item["Marathon"]))}</td>
+            <div className="table-wrapper">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th onClick={() => handleSort('m400')}>400m</th>
+                        <th onClick={() => handleSort('h-mile')}>Half-mile</th>
+                        <th onClick={() => handleSort('1k')}>1K</th>
+                        <th onClick={() => handleSort('one-mile')}>One-mile</th>
+                        <th onClick={() => handleSort('two-mile')}>Two-mile</th>
+                        <th onClick={() => handleSort('5K')}>5K</th>
+                        <th onClick={() => handleSort('10K')}>10K</th>
+                        <th onClick={() => handleSort('15K')}>15K</th>
+                        <th onClick={() => handleSort('10mile')}>10-mile</th>
+                        <th onClick={() => handleSort('20K')}>20K</th>
+                        <th onClick={() => handleSort('Half-Marathon')}>Half-Marathon</th>
+                        <th onClick={() => handleSort('Marathon')}>Marathon</th>
                     </tr>
-                ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {filteredData.map((item) => (
+                        <tr key={item.athlete_id}>
+                            <td>{item.rank}</td>
+                            <td className="name-column">
+                                <img className="avatar" src={item.avatar_src} alt="Avatar" />
+                                <span>{item.name}</span>
+                            </td>
+                            <td>{formatTime(Number(item.m400))}</td>
+                            <td>{formatTime(Number(item["h-mile"]))}</td>
+                            <td>{formatTime(Number(item["1k"]))}</td>
+                            <td>{formatTime(Number(item["one-mile"]))}</td>
+                            <td>{formatTime(Number(item["two-mile"]))}</td>
+                            <td>{formatTime(Number(item["5K"]))}</td>
+                            <td>{formatTime(Number(item["10K"]))}</td>
+                            <td>{formatTime(Number(item["15K"]))}</td>
+                            <td>{formatTime(Number(item["10mile"]))}</td>
+                            <td>{formatTime(Number(item["20K"]))}</td>
+                            <td>{formatTime(Number(item["Half-Marathon"]))}</td>
+                            <td>{formatTime(Number(item["Marathon"]))}</td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
