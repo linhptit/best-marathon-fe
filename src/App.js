@@ -5,10 +5,10 @@ import './App.css';
 function App() {
     const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortConfig, setSortConfig] = useState(null);
+    const [sortConfig, setSortConfig] = useState({ key: 'Marathon', direction: 'ascending' });
 
     useEffect(() => {
-        fetch('/voz.csv')
+        fetch('/data.csv')
             .then((response) => response.text())
             .then((text) => {
                 Papa.parse(text, {
@@ -20,6 +20,22 @@ function App() {
             })
             .catch((error) => console.error('Error fetching CSV data:', error));
     }, []);
+
+    useEffect(() => {
+        if (data.length > 0) {
+            const sortedData = [...data].sort((a, b) => {
+                const aValue = a.Marathon ? Number(a.Marathon) : Infinity;
+                const bValue = b.Marathon ? Number(b.Marathon) : Infinity;
+                return aValue - bValue;
+            });
+
+            sortedData.forEach((item, index) => {
+                item.rank = item.Marathon ? index + 1 : '-';
+            });
+
+            setData(sortedData);
+        }
+    }, [data]);
 
     const formatTime = (seconds) => {
         if (!seconds) return '';
@@ -77,6 +93,7 @@ function App() {
             <table>
                 <thead>
                 <tr>
+                    <th>Rank</th>
                     <th>Name</th>
                     <th onClick={() => handleSort('m400')}>400m</th>
                     <th onClick={() => handleSort('h-mile')}>Half-mile</th>
@@ -95,9 +112,10 @@ function App() {
                 <tbody>
                 {filteredData.map((item) => (
                     <tr key={item.athlete_id}>
-                        <td>
+                        <td>{item.rank}</td>
+                        <td className="name-column">
                             <img className="avatar" src={item.avatar_src} alt="Avatar" />
-                            {item.name}
+                            <span>{item.name}</span>
                         </td>
                         <td>{formatTime(Number(item.m400))}</td>
                         <td>{formatTime(Number(item["h-mile"]))}</td>

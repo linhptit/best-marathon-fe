@@ -35,10 +35,15 @@ table th {
   background-color: #f2f2f2;
 }
 
+.name-column {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 table td img.avatar {
   width: 30px;
   height: 30px;
   border-radius: 50%;
   margin-right: 10px;
-  vertical-align: middle;
 }
