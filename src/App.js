@@ -24,13 +24,13 @@ function App() {
     useEffect(() => {
         if (data.length > 0) {
             const sortedData = [...data].sort((a, b) => {
-                const aValue = a.Marathon ? Number(a.Marathon) : Infinity;
-                const bValue = b.Marathon ? Number(b.Marathon) : Infinity;
+                const aValue = a["Half-Marathon"] ? Number(a["Half-Marathon"]) : Infinity;
+                const bValue = b["Half-Marathon"] ? Number(b["Half-Marathon"]) : Infinity;
                 return aValue - bValue;
             });
 
             sortedData.forEach((item, index) => {
-                item.rank = item.Marathon ? index + 1 : '-';
+                item.rank = item["Half-Marathon"] ? index + 1 : '-';
             });
 
             setData(sortedData);
@@ -80,6 +80,18 @@ function App() {
         item.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const handleError = (e, name) => {
+        e.target.style.display = 'none';
+        const parent = e.target.parentElement;
+        parent.style.display = 'flex';
+        parent.style.alignItems = 'center';
+        parent.style.justifyContent = 'center';
+        const initial = document.createElement('div');
+        initial.className = 'default-avatar';
+        initial.textContent = name.charAt(0);
+        parent.appendChild(initial);
+    };
+
     return (
         <div className="leaderboard">
             <input
@@ -97,15 +109,15 @@ function App() {
                         <th>Rank</th>
                         <th>Name</th>
                         <th onClick={() => handleSort('m400')}>400m</th>
-                        <th onClick={() => handleSort('h-mile')}>Half-mile</th>
-                        <th onClick={() => handleSort('1k')}>1K</th>
-                        <th onClick={() => handleSort('one-mile')}>One-mile</th>
-                        <th onClick={() => handleSort('two-mile')}>Two-mile</th>
+                        <th onClick={() => handleSort('h-mile')} hidden={true}>Half-mile</th>
+                        <th onClick={() => handleSort('1k')}>1000m</th>
+                        <th onClick={() => handleSort('one-mile')} hidden={true}>One-mile</th>
+                        <th onClick={() => handleSort('two-mile')} hidden={true}>Two-mile</th>
                         <th onClick={() => handleSort('5K')}>5K</th>
                         <th onClick={() => handleSort('10K')}>10K</th>
-                        <th onClick={() => handleSort('15K')}>15K</th>
-                        <th onClick={() => handleSort('10mile')}>10-mile</th>
-                        <th onClick={() => handleSort('20K')}>20K</th>
+                        <th onClick={() => handleSort('15K')} hidden={true}>15K</th>
+                        <th onClick={() => handleSort('10mile')} hidden={true}>10-mile</th>
+                        <th onClick={() => handleSort('20K')} hidden={true}>20K</th>
                         <th onClick={() => handleSort('Half-Marathon')}>Half-Marathon</th>
                         <th onClick={() => handleSort('Marathon')}>Marathon</th>
                     </tr>
@@ -115,19 +127,21 @@ function App() {
                         <tr key={item.athlete_id}>
                             <td>{item.rank}</td>
                             <td className="name-column">
-                                <img className="avatar" src={item.avatar_src} alt="Avatar" />
+                                <div className="avatar-wrapper">
+                                    <img className="avatar" src={item.avatar_src} alt="Avatar" onError={(e) => handleError(e, item.name)} />
+                                </div>
                                 <span>{item.name}</span>
                             </td>
                             <td>{formatTime(Number(item.m400))}</td>
-                            <td>{formatTime(Number(item["h-mile"]))}</td>
+                            <td hidden={true}>{formatTime(Number(item["h-mile"]))}</td>
                             <td>{formatTime(Number(item["1k"]))}</td>
-                            <td>{formatTime(Number(item["one-mile"]))}</td>
-                            <td>{formatTime(Number(item["two-mile"]))}</td>
+                            <td hidden={true}>{formatTime(Number(item["one-mile"]))}</td>
+                            <td hidden={true}>{formatTime(Number(item["two-mile"]))}</td>
                             <td>{formatTime(Number(item["5K"]))}</td>
                             <td>{formatTime(Number(item["10K"]))}</td>
-                            <td>{formatTime(Number(item["15K"]))}</td>
-                            <td>{formatTime(Number(item["10mile"]))}</td>
-                            <td>{formatTime(Number(item["20K"]))}</td>
+                            <td hidden={true}>{formatTime(Number(item["15K"]))}</td>
+                            <td hidden={true}>{formatTime(Number(item["10mile"]))}</td>
+                            <td hidden={true}>{formatTime(Number(item["20K"]))}</td>
                             <td>{formatTime(Number(item["Half-Marathon"]))}</td>
                             <td>{formatTime(Number(item["Marathon"]))}</td>
                         </tr>

@@ -51,10 +51,31 @@ table th {
   justify-content: center;
 }
 
+.avatar-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
 table td img.avatar {
   width: 30px;
   height: 30px;
   border-radius: 50%;
+  margin-right: 10px;
+}
+
+.default-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
   margin-right: 10px;
 }
 
@@ -64,10 +85,15 @@ table td img.avatar {
     padding: 4px;
   }
 
-  table td img.avatar {
+  table td img.avatar,
+  .default-avatar {
     width: 20px;
     height: 20px;
     margin-right: 5px;
+  }
+
+  .default-avatar {
+    font-size: 12px;
   }
 }
 
