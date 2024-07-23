@@ -22,7 +22,7 @@ function App() {
                     avatar_url: item.avatar_url,
                     rank: item.rank,
                     strava_id: item.strava_id,
-                    ...item.best_times
+                    best_times: item.best_times
                 }));
                 setData(parsedData);
             })
@@ -71,6 +71,18 @@ function App() {
         setSearchTerm('');
     };
 
+    const renderBestTime = (bestTimes, distanceKey) => {
+        const bestTime = bestTimes.find(time => time.distance === distanceKey);
+        if (bestTime) {
+            return (
+                <a href={`https://www.strava.com/activities/${bestTime.activity_strava_id}`} target="_blank" rel="noopener noreferrer">
+                    {formatTime(Number(bestTime.time))}
+                </a>
+            );
+        }
+        return '';
+    };
+
     return (
         <div className="leaderboard">
             <input
@@ -109,20 +121,20 @@ function App() {
                                 <div className="avatar-wrapper">
                                     <img className="avatar" src={item.avatar_url} alt="Avatar" onError={(e) => handleError(e, item.name)} />
                                 </div>
-                                <span><a href={"https://www.strava.com/athletes/" + item.strava_id} target={"_blank"}>{item.name}</a></span>
+                                <span><a href={`https://www.strava.com/athletes/${item.strava_id}`} target="_blank" rel="noopener noreferrer">{item.name}</a></span>
                             </td>
-                            <td>{formatTime(Number(item.FOUR_HUNDRED_M))}</td>
-                            <td hidden={true}>{formatTime(Number(item.ONE_HALF_MILE))}</td>
-                            <td>{formatTime(Number(item.ONE_K))}</td>
-                            <td hidden={true}>{formatTime(Number(item.ONE_MILE))}</td>
-                            <td hidden={true}>{formatTime(Number(item.TWO_MILE))}</td>
-                            <td>{formatTime(Number(item.FIVE_K))}</td>
-                            <td>{formatTime(Number(item.TEN_K))}</td>
-                            <td hidden={true}>{formatTime(Number(item.FIFTEEN_K))}</td>
-                            <td hidden={true}>{formatTime(Number(item.TEN_MILE))}</td>
-                            <td hidden={true}>{formatTime(Number(item.TWENTY_K))}</td>
-                            <td>{formatTime(Number(item.HALF_MARATHON))}</td>
-                            <td>{formatTime(Number(item.MARATHON))}</td>
+                            <td>{renderBestTime(item.best_times, 'FOUR_HUNDRED_M')}</td>
+                            <td hidden={true}>{renderBestTime(item.best_times, 'ONE_HALF_MILE')}</td>
+                            <td>{renderBestTime(item.best_times, 'ONE_K')}</td>
+                            <td hidden={true}>{renderBestTime(item.best_times, 'ONE_MILE')}</td>
+                            <td hidden={true}>{renderBestTime(item.best_times, 'TWO_MILE')}</td>
+                            <td>{renderBestTime(item.best_times, 'FIVE_K')}</td>
+                            <td>{renderBestTime(item.best_times, 'TEN_K')}</td>
+                            <td hidden={true}>{renderBestTime(item.best_times, 'FIFTEEN_K')}</td>
+                            <td hidden={true}>{renderBestTime(item.best_times, 'TEN_MILE')}</td>
+                            <td hidden={true}>{renderBestTime(item.best_times, 'TWENTY_K')}</td>
+                            <td>{renderBestTime(item.best_times, 'HALF_MARATHON')}</td>
+                            <td>{renderBestTime(item.best_times, 'MARATHON')}</td>
                         </tr>
                     ))}
                     </tbody>
