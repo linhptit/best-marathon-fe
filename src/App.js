@@ -1,41 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import Papa from 'papaparse';
 import './App.css';
+
+const API_DOMAIN = process.env.REACT_APP_API_DOMAIN;
 
 function App() {
     const [data, setData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [sortConfig, setSortConfig] = useState({ key: 'Marathon', direction: 'ascending' });
+    const [sortConfig, setSortConfig] = useState({ key: 'MARATHON', direction: 'ascending' });
 
-    useEffect(() => {
-        fetch('/data.csv')
-            .then((response) => response.text())
-            .then((text) => {
-                Papa.parse(text, {
-                    header: true,
-                    complete: (result) => {
-                        setData(result.data);
-                    },
-                });
+    const fetchData = () => {
+        const sortQuery = `${sortConfig.key}:${sortConfig.direction === 'ascending' ? 'asc' : 'desc'}`;
+        const url = `${API_DOMAIN}/api/athletes/best-times?sortDistance=${sortQuery}`;
+
+        fetch(url)
+            .then((response) => response.json())
+            .then((result) => {
+                const parsedData = result.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    avatar_url: item.avatar_url,
+                    rank: item.rank,
+                    ...item.best_times
+                }));
+                setData(parsedData);
             })
-            .catch((error) => console.error('Error fetching CSV data:', error));
-    }, []);
+            .catch((error) => console.error('Error fetching data:', error));
+    };
 
     useEffect(() => {
-        if (data.length > 0) {
-            const sortedData = [...data].sort((a, b) => {
-                const aValue = a["Half-Marathon"] ? Number(a["Half-Marathon"]) : Infinity;
-                const bValue = b["Half-Marathon"] ? Number(b["Half-Marathon"]) : Infinity;
-                return aValue - bValue;
-            });
-
-            sortedData.forEach((item, index) => {
-                item.rank = item["Half-Marathon"] ? index + 1 : '-';
-            });
-
-            setData(sortedData);
-        }
-    }, [data]);
+        fetchData();
+    }, [sortConfig]);
 
     const formatTime = (seconds) => {
         if (!seconds) return '';
@@ -57,23 +51,6 @@ function App() {
             direction = 'descending';
         }
         setSortConfig({ key, direction });
-
-        setData((prevData) => {
-            return [...prevData].sort((a, b) => {
-                const aValue = Number(a[key]);
-                const bValue = Number(b[key]);
-
-                if (!a[key] && b[key]) return 1;
-                if (a[key] && !b[key]) return -1;
-                if (!a[key] && !b[key]) return 0;
-
-                if (direction === 'ascending') {
-                    return aValue - bValue;
-                } else {
-                    return bValue - aValue;
-                }
-            });
-        });
     };
 
     const filteredData = data.filter((item) =>
@@ -101,49 +78,49 @@ function App() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="refresh" onClick={() => window.location.reload()}>LÀM MỚI</button>
+            <button className="refresh" onClick={() => fetchData()}>LÀM MỚI</button>
             <div className="table-wrapper">
                 <table>
                     <thead>
                     <tr>
                         <th>Rank</th>
                         <th>Name</th>
-                        <th onClick={() => handleSort('m400')}>400m</th>
-                        <th onClick={() => handleSort('h-mile')} hidden={true}>Half-mile</th>
-                        <th onClick={() => handleSort('1k')}>1000m</th>
-                        <th onClick={() => handleSort('one-mile')} hidden={true}>One-mile</th>
-                        <th onClick={() => handleSort('two-mile')} hidden={true}>Two-mile</th>
-                        <th onClick={() => handleSort('5K')}>5K</th>
-                        <th onClick={() => handleSort('10K')}>10K</th>
-                        <th onClick={() => handleSort('15K')} hidden={true}>15K</th>
-                        <th onClick={() => handleSort('10mile')} hidden={true}>10-mile</th>
-                        <th onClick={() => handleSort('20K')} hidden={true}>20K</th>
-                        <th onClick={() => handleSort('Half-Marathon')}>Half-Marathon</th>
-                        <th onClick={() => handleSort('Marathon')}>Marathon</th>
+                        <th onClick={() => handleSort('FOUR_HUNDRED_M')}>400m</th>
+                        <th onClick={() => handleSort('ONE_HALF_MILE')} hidden={true}>Half-mile</th>
+                        <th onClick={() => handleSort('ONE_K')}>1000m</th>
+                        <th onClick={() => handleSort('ONE_MILE')} hidden={true}>One-mile</th>
+                        <th onClick={() => handleSort('TWO_MILE')} hidden={true}>Two-mile</th>
+                        <th onClick={() => handleSort('FIVE_K')}>5K</th>
+                        <th onClick={() => handleSort('TEN_K')}>10K</th>
+                        <th onClick={() => handleSort('FIFTEEN_K')} hidden={true}>15K</th>
+                        <th onClick={() => handleSort('TEN_MILE')} hidden={true}>10-mile</th>
+                        <th onClick={() => handleSort('TWENTY_K')} hidden={true}>20K</th>
+                        <th onClick={() => handleSort('HALF_MARATHON')}>Half-Marathon</th>
+                        <th onClick={() => handleSort('MARATHON')}>Marathon</th>
                     </tr>
                     </thead>
                     <tbody>
                     {filteredData.map((item) => (
-                        <tr key={item.athlete_id}>
+                        <tr key={item.id}>
                             <td>{item.rank}</td>
                             <td className="name-column">
                                 <div className="avatar-wrapper">
-                                    <img className="avatar" src={item.avatar_src} alt="Avatar" onError={(e) => handleError(e, item.name)} />
+                                    <img className="avatar" src={item.avatar_url} alt="Avatar" onError={(e) => handleError(e, item.name)} />
                                 </div>
                                 <span>{item.name}</span>
                             </td>
-                            <td>{formatTime(Number(item.m400))}</td>
-                            <td hidden={true}>{formatTime(Number(item["h-mile"]))}</td>
-                            <td>{formatTime(Number(item["1k"]))}</td>
-                            <td hidden={true}>{formatTime(Number(item["one-mile"]))}</td>
-                            <td hidden={true}>{formatTime(Number(item["two-mile"]))}</td>
-                            <td>{formatTime(Number(item["5K"]))}</td>
-                            <td>{formatTime(Number(item["10K"]))}</td>
-                            <td hidden={true}>{formatTime(Number(item["15K"]))}</td>
-                            <td hidden={true}>{formatTime(Number(item["10mile"]))}</td>
-                            <td hidden={true}>{formatTime(Number(item["20K"]))}</td>
-                            <td>{formatTime(Number(item["Half-Marathon"]))}</td>
-                            <td>{formatTime(Number(item["Marathon"]))}</td>
+                            <td>{formatTime(Number(item.FOUR_HUNDRED_M))}</td>
+                            <td hidden={true}>{formatTime(Number(item.ONE_HALF_MILE))}</td>
+                            <td>{formatTime(Number(item.ONE_K))}</td>
+                            <td hidden={true}>{formatTime(Number(item.ONE_MILE))}</td>
+                            <td hidden={true}>{formatTime(Number(item.TWO_MILE))}</td>
+                            <td>{formatTime(Number(item.FIVE_K))}</td>
+                            <td>{formatTime(Number(item.TEN_K))}</td>
+                            <td hidden={true}>{formatTime(Number(item.FIFTEEN_K))}</td>
+                            <td hidden={true}>{formatTime(Number(item.TEN_MILE))}</td>
+                            <td hidden={true}>{formatTime(Number(item.TWENTY_K))}</td>
+                            <td>{formatTime(Number(item.HALF_MARATHON))}</td>
+                            <td>{formatTime(Number(item.MARATHON))}</td>
                         </tr>
                     ))}
                     </tbody>
