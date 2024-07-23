@@ -10,7 +10,8 @@ function App() {
 
     const fetchData = () => {
         const sortQuery = `${sortConfig.key}:${sortConfig.direction === 'ascending' ? 'asc' : 'desc'}`;
-        const url = `${API_DOMAIN}/api/athletes/best-times?sortDistance=${sortQuery}`;
+        const searchQuery = searchTerm ? `&name_contains=${searchTerm}` : '';
+        const url = `${API_DOMAIN}/api/athletes/best-times?sortDistance=${sortQuery}${searchQuery}`;
 
         fetch(url)
             .then((response) => response.json())
@@ -20,6 +21,7 @@ function App() {
                     name: item.name,
                     avatar_url: item.avatar_url,
                     rank: item.rank,
+                    strava_id: item.strava_id,
                     ...item.best_times
                 }));
                 setData(parsedData);
@@ -29,7 +31,7 @@ function App() {
 
     useEffect(() => {
         fetchData();
-    }, [sortConfig]);
+    }, [sortConfig, searchTerm]);
 
     const formatTime = (seconds) => {
         if (!seconds) return '';
@@ -53,10 +55,6 @@ function App() {
         setSortConfig({ key, direction });
     };
 
-    const filteredData = data.filter((item) =>
-        item.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     const handleError = (e, name) => {
         e.target.style.display = 'none';
         const parent = e.target.parentElement;
@@ -69,6 +67,10 @@ function App() {
         parent.appendChild(initial);
     };
 
+    const handleRefresh = () => {
+        setSearchTerm('');
+    };
+
     return (
         <div className="leaderboard">
             <input
@@ -78,7 +80,7 @@ function App() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="refresh" onClick={() => fetchData()}>LÀM MỚI</button>
+            <button className="refresh" onClick={handleRefresh}>LÀM MỚI</button>
             <div className="table-wrapper">
                 <table>
                     <thead>
@@ -100,14 +102,14 @@ function App() {
                     </tr>
                     </thead>
                     <tbody>
-                    {filteredData.map((item) => (
+                    {data.map((item) => (
                         <tr key={item.id}>
                             <td>{item.rank}</td>
                             <td className="name-column">
                                 <div className="avatar-wrapper">
                                     <img className="avatar" src={item.avatar_url} alt="Avatar" onError={(e) => handleError(e, item.name)} />
                                 </div>
-                                <span>{item.name}</span>
+                                <span><a href={"https://www.strava.com/athletes/" + item.strava_id} target={"_blank"}>{item.name}</a></span>
                             </td>
                             <td>{formatTime(Number(item.FOUR_HUNDRED_M))}</td>
                             <td hidden={true}>{formatTime(Number(item.ONE_HALF_MILE))}</td>
